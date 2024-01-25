@@ -1,0 +1,12 @@
+{
+    "project_name": "Basic Poetry Python Project",
+    "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_') }}",
+    "project_description": "Short project description",
+    "author": "Author Fullname",
+    "email": "author@email.com",
+    "python_version": "3.9.7",
+    "version": "0.1.0",
+    "use_pytest": "y",
+    "codecov": "y",
+    "sphinx": "y"
+}
