@@ -25,12 +25,19 @@ clean-build: ## clean build artifacts
 
 .PHONY: publish
 publish: ## Publish to the Artifactory repository using poetry. Requires ARTIFACTORY_TOKEN to be set.
-	@echo "🚀 Publishing: Dry run."
+	@if [ -z "$(ARTIFACTORY_URL)" ] || [ -z "$(ARTIFACTORY_USERNAME)" ] || [ -z "$(ARTIFACTORY_PASSWORD)" ]; then \
+		echo "❌ Error: Missing environment variables ARTIFACTORY_URL, ARTIFACTORY_USERNAME, or ARTIFACTORY_PASSWORD"; \
+		exit 1; \
+	fi
+	@echo "🚀 Configuring: Repository"
 	@poetry config repositories.artifactory $(ARTIFACTORY_URL)
-	@poetry publish --repository artifactory --username $(ARTIFACTORY_USERNAME) --password $(ARTIFACTORY_PASSWORD) --dry-run
-	@echo "🚀 Publishing."
-	@poetry publish --repository artifactory --username $(ARTIFACTORY_USERNAME) --password $(ARTIFACTORY_PASSWORD)
-
+	@echo "🚀 Configuring: User"
+	@poetry config http-basic.bayer $(ARTIFACTORY_USERNAME) $(ARTIFACTORY_PASSWORD)
+	@echo "🚀 Publishing: Dry Run"
+	@poetry publish --repository artifactory --dry-run
+	@echo "🚀 Publishing: Upload"
+	@poetry publish --repository artifactory
+	
 .PHONY: build-and-publish
 build-and-publish: build publish ## Build and publish.
 
