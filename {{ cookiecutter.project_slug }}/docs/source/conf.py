@@ -26,6 +26,7 @@ extensions = [
     "sphinx_rtd_theme",
     "sphinx.ext.napoleon",
     'sphinx.ext.mathjax',
+    'sphinx.ext.autosummary',
     "nbsphinx"
 ]
 
@@ -37,3 +38,10 @@ exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ['_static']
+
+# Napoleon settings
+napoleon_google_docstring = True
+napoleon_include_init_with_doc = True
+
+# Autosumamry settings
+autosummary_generate = True
