@@ -37,16 +37,17 @@ jobs:
           name: docs
           path: docs/_build/html/
 
+  {%- if cookiecutter.bayer_int == "y" %}
   deploy:
     name: "Publish Docs"
     needs: build
     
-    # See the full reference for available parameters https://docs.int.bayer.com/ref/
     uses: bayer-int/actions-workflows/.github/workflows/publish-docs.yml@main
     with:
       namespace: '{{cookiecutter.project_slug}}'
       artifact: docs
       dir:      docs
-      preview:  ${{ github.ref != 'refs/heads/main' && github.run_id || '' }}
+      preview:  ${{ github.ref != 'refs/heads/main' and github.run_id or '' }}
+  {%- endif%}
 
 {%- endif%}

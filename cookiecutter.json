@@ -8,5 +8,6 @@
     "version": "0.1.0",
     "use_pytest": "y",
     "codecov": "y",
-    "sphinx": "y"
+    "sphinx": "y",
+    "bayer_int" : "n"
 }
