@@ -48,7 +48,7 @@ jobs:
       artifact: docs
       dir:      docs
       {% raw %}
-      preview:  ${{ github.ref != 'refs/heads/main' and github.run_id or '' }}
+      preview:  ${{ github.ref != 'refs/heads/main' && github.run_id or '' }}
       {% endraw %}
   {%- endif%}
 
