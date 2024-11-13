@@ -9,7 +9,8 @@ install: ## Install the poetry environment and install the pre-commit hooks
 test: ## Test the code with pytest
 	@echo "🚀 Testing code: Running pytest"
 {%- if cookiecutter.codecov == "y"%}
-	@poetry run pytest --cov --cov-config=pyproject.toml --cov-report=xml && coverage report -m
+	@poetry run pytest --cov --cov-config=pyproject.toml --cov-report=xml
+	@poetry run coverage report -m
 {%- else %}
 	@poetry run pytest --doctest-modules
 {%- endif%}
