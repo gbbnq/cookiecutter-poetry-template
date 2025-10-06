@@ -1,5 +1,5 @@
 {
-    "project_name": "Basic Poetry Python Project",
+    "project_name": "Basic UV Python Project",
     "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_') }}",
     "project_description": "Short project description",
     "author": "Author Fullname",
@@ -9,5 +9,6 @@
     "use_pytest": "y",
     "codecov": "y",
     "sphinx": "y",
-    "bayer_int" : "n"
+    "bayer_int" : "n",
+    "artifactory_url": "https://artifactory.bayer.com/artifactory/api/pypi/phcpd-pypi-dev-processmodeling"
 }
