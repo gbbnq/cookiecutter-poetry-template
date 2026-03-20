@@ -1,59 +1,61 @@
-# Cookiecutter Template for Python Project
+# Cookiecutter Template: Python Data Science Project
 
-This is a simple and customizable Cookiecutter template for starting a new Python project. It leverages Poetry for dependency management and packaging. Based on [fpgmaas/cookiecutter-poetry](https://github.com/fpgmaas/cookiecutter-poetry).
+A modern, opinionated Cookiecutter template for Python data science projects. Uses **UV** for fast dependency management, **ruff** for linting/formatting, and comes pre-configured for data science workflows.
 
-## Basic Usage
+## Features
 
-1. **Install Cookiecutter**: Install the [Cookiecutter](https://github.com/cookiecutter/cookiecutter) package using pip:
-    ```sh
-    pip install cookiecutter
-    ```
+- **UV** for blazing-fast dependency management and virtual environments
+- **Hatchling** build backend (PEP 517)
+- **Ruff** for linting and formatting (replaces black, isort, flake8)
+- **Mypy** for type checking
+- **Pytest** with optional coverage
+- **Pre-commit** hooks (ruff, nbstripout, trailing whitespace, etc.)
+- **JupyterLab** integration
+- **Sphinx** documentation with MyST (Markdown) support
+- **GitHub Actions** CI/CD
+- **DVC** support (optional)
+- **CLAUDE.md** for Claude Code integration
+- Data science directory structure (`data/raw`, `data/processed`, `data/outputs`)
 
-2. **Render Template**: Use Cookiecutter to render the template by specifying the path to the `cookiecutter.json` file:
-    ```sh
-    cookiecutter $PATH_TO_COOKIECUTTER.JSON
-    ```
+## Quick Start
 
-3. **Enter Project Details**: Fill in the required project details in the `cookiecutter.json` file:
-    - `project_name`: The name of your project.
-    - `project_slug`: The project slug, automatically generated from the project name.
-    - `project_description`: A short description of your project.
-    - `author`: The full name of the author.
-    - `email`: The email address of the author.
-    - `python_version`: The version of Python to use.
-    - `version`: The initial version of the project.
-    - `use_pytest`: Whether to include pytest for testing (y/n).
-    - `codecov`: Whether to include Codecov for code coverage (y/n).
-    - `sphinx`: Whether to include Sphinx for documentation (y/n).
-    - `bayer_int`: 'y' if Bayer internal workflow for documentation deployment is to be used. Is 'n' by default.
+```bash
+# Install cookiecutter (or use uvx)
+pip install cookiecutter
 
-4. **Install Dependencies**: Create a local virtual environment and install dependencies using Poetry:
-    ```sh
-    make install
-    ```
+# Render the template
+cookiecutter /path/to/this/template
 
-5. **Run Tests**: Execute tests using pytest:
-    ```sh
-    make test
-    ```
+# Or directly from git
+cookiecutter gh:your-username/SimplePythonProject
+```
 
-6. **Build Project**: Build the project into a .whl file:
-    ```sh
-    make build
-    ```
+## Template Options
 
-7. **Build Documentation**: Generate HTML documentation using Sphinx:
-    ```sh
-    make docs-html
-    ```
+| Option | Default | Description |
+|---|---|---|
+| `project_name` | My Data Science Project | Human-readable project name |
+| `project_slug` | (auto-generated) | Python package name |
+| `project_description` | A modern Python data science project | Short description |
+| `author` | Author Fullname | Your name |
+| `email` | author@email.com | Your email |
+| `python_version` | 3.12 | Minimum Python version |
+| `version` | 0.1.0 | Initial version |
+| `use_notebooks` | y | Include JupyterLab and notebook tooling |
+| `use_dvc` | n | Include DVC for data versioning |
+| `codecov` | y | Include pytest-cov for coverage |
+| `sphinx` | y | Include Sphinx documentation |
 
-8. **Publish Package**: Publish the Python package to Artifactory:
-    ```sh
-    make publish
-    ```
+## After Generation
 
-## Additional Information
+```bash
+cd your_project_slug
+make install    # Create venv, install deps, set up pre-commit
+make check      # Run lint + type-check + tests
+make lab        # Launch JupyterLab
+```
 
-- **Poetry**: Poetry is used for dependency management and packaging. Ensure you have Poetry installed. For installation instructions, visit the [Poetry documentation](https://python-poetry.org/docs/#installation).
-- **Cookiecutter**: Cookiecutter is a command-line utility that creates projects from project templates. For more information, visit the [Cookiecutter documentation](https://cookiecutter.readthedocs.io/en/latest/).
-- **Makefile**: The provided `Makefile` includes various commands to streamline your workflow. Use `make <command>` to execute the corresponding tasks.
+## Requirements
+
+- [UV](https://docs.astral.sh/uv/) >= 0.5
+- Python >= 3.12 (configurable)

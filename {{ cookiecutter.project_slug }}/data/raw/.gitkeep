@@ -1,0 +1,3 @@
+# Data directory
+
+Place raw, immutable data files here. This directory is not tracked by git.

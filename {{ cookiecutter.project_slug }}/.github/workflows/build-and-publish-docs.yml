@@ -1,55 +1,32 @@
 {%- if cookiecutter.sphinx == "y" %}
-
-name: "Sync website"
+name: Build Docs
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches: [main]
 
 jobs:
-  build:
-    name: "Build docs"
+  docs:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
 
-      - name: Set up UV
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Set up Python
+        run: uv python install
 
       - name: Install dependencies
-        run: uv venv --clear
+        run: uv sync --group docs
 
       - name: Build docs
-        run: make docs-html
+        run: make docs
 
       - uses: actions/upload-artifact@v4
         with:
           name: docs
           path: docs/_build/html/
-
-  {%- if cookiecutter.bayer_int == "y" %}
-  deploy:
-    name: "Publish Docs"
-    needs: build
-    
-    uses: bayer-int/actions-workflows/.github/workflows/publish-docs.yml@main
-    with:
-      namespace: '{{cookiecutter.project_slug}}'
-      artifact: docs
-      dir:      docs
-      {% raw %}
-      preview:  ${{ github.ref != 'refs/heads/main' && github.run_id or '' }}
-      {% endraw %}
-  {%- endif%}
-
-{%- endif%}
+{%- endif %}

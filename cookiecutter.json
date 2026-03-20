@@ -1,14 +1,13 @@
 {
-    "project_name": "Basic UV Python Project",
-    "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_') }}",
-    "project_description": "Short project description",
+    "project_name": "My Data Science Project",
+    "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
+    "project_description": "A modern Python data science project",
     "author": "Author Fullname",
     "email": "author@email.com",
-    "python_version": "3.9.7",
+    "python_version": "3.12",
     "version": "0.1.0",
-    "use_pytest": "y",
+    "use_notebooks": "y",
+    "use_dvc": "n",
     "codecov": "y",
-    "sphinx": "y",
-    "bayer_int" : "n",
-    "artifactory_url": "https://artifactory.bayer.com/artifactory/api/pypi/phcpd-pypi-dev-processmodeling"
+    "sphinx": "y"
 }

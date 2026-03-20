@@ -1,87 +1,97 @@
 .PHONY: install
-install: ## Install the uv environment and install the pre-commit hooks
+install: ## Install the uv environment and pre-commit hooks
 	@echo "🚀 Creating virtual environment using uv"
-	@uv venv --clear
-	@echo "🚀 Installing dependencies"
 	@uv sync --all-groups
+	@echo "🚀 Installing pre-commit hooks"
+	@uv run pre-commit install
+
+.PHONY: check
+check: lint type-check test ## Run all checks (lint, type-check, test)
+
+.PHONY: lint
+lint: ## Run ruff linter and formatter
+	@echo "🚀 Linting code with ruff"
+	@uv run ruff check {{cookiecutter.project_slug}} tests --fix
+	@uv run ruff format {{cookiecutter.project_slug}} tests
+
+.PHONY: lint-check
+lint-check: ## Check linting without fixing
+	@uv run ruff check {{cookiecutter.project_slug}} tests
+	@uv run ruff format --check {{cookiecutter.project_slug}} tests
+
+.PHONY: type-check
+type-check: ## Run mypy type checker
+	@echo "🚀 Type checking with mypy"
+	@uv run mypy {{cookiecutter.project_slug}}
 
 .PHONY: test
-test: ## Test the code with pytest
-	@echo "🚀 Testing code: Running pytest"
+test: ## Run tests with pytest
+	@echo "🚀 Running pytest"
 {%- if cookiecutter.codecov == "y"%}
-	@uv run pytest --cov --cov-config=pyproject.toml --cov-report=xml
-	@uv run coverage report -m
+	@uv run pytest --cov --cov-config=pyproject.toml --cov-report=xml --cov-report=term-missing
 {%- else %}
-	@uv run pytest --doctest-modules
+	@uv run pytest
 {%- endif%}
 
+{%- if cookiecutter.use_notebooks == "y" %}
+
+.PHONY: lab
+lab: ## Launch JupyterLab
+	@echo "🚀 Launching JupyterLab"
+	@uv run --group notebooks jupyter lab --notebook-dir=notebooks
+{%- endif %}
+
 .PHONY: build
-build: clean ## Build wheel file using uv
-	@echo "🚀 Creating wheel file"
+build: clean ## Build wheel file
+	@echo "🚀 Building wheel"
 	@uv build
 
 .PHONY: clean
-clean: ## clean build artifacts
-	@rm -rf dist
+clean: ## Clean build artifacts
+	@rm -rf dist build *.egg-info .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml
+	@find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 
 .PHONY: publish
-publish: ## Publish to the Artifactory repository using uv. Requires ARTIFACTORY_TOKEN to be set.
-	@if [ -z "$(ARTIFACTORY_URL)" ] || [ -z "$(ARTIFACTORY_USERNAME)" ] || [ -z "$(ARTIFACTORY_PASSWORD)" ]; then \
-		echo "❌ Error: Missing environment variables ARTIFACTORY_URL, ARTIFACTORY_USERNAME, or ARTIFACTORY_PASSWORD"; \
+publish: ## Publish package (set UV_PUBLISH_URL, UV_PUBLISH_USERNAME, UV_PUBLISH_PASSWORD)
+	@if [ -z "$(UV_PUBLISH_URL)" ]; then \
+		echo "❌ Error: UV_PUBLISH_URL not set"; \
 		exit 1; \
 	fi
-	@echo "🚀 Publishing to Artifactory"
-	@UV_PUBLISH_URL="$(ARTIFACTORY_URL)" UV_PUBLISH_USERNAME="$(ARTIFACTORY_USERNAME)" UV_PUBLISH_PASSWORD="$(ARTIFACTORY_PASSWORD)" uv publish
-
-.PHONY: build-and-publish
-build-and-publish: build publish ## Build and publish.
+	@echo "🚀 Publishing package"
+	@uv publish
 
 .PHONY: version-patch
 version-patch: ## Bump patch version (1.2.3 => 1.2.4)
-	@echo "🚀 Bumping patch version"
 	@uv version --bump patch
-	@$(MAKE) _update-init-version
-	@$(MAKE) _git-tag-and-push
+	@$(MAKE) _sync-version
 
 .PHONY: version-minor
 version-minor: ## Bump minor version (1.2.3 => 1.3.0)
-	@echo "🚀 Bumping minor version"
 	@uv version --bump minor
-	@$(MAKE) _update-init-version
-	@$(MAKE) _git-tag-and-push
+	@$(MAKE) _sync-version
 
 .PHONY: version-major
 version-major: ## Bump major version (1.2.3 => 2.0.0)
-	@echo "🚀 Bumping major version"
 	@uv version --bump major
-	@$(MAKE) _update-init-version
-	@$(MAKE) _git-tag-and-push
+	@$(MAKE) _sync-version
 
-.PHONY: _update-init-version
-_update-init-version: ## Internal: Update version in __init__.py
-	@echo "🔄 Updating version in __init__.py"
+.PHONY: _sync-version
+_sync-version:
 	@NEW_VERSION=$$(uv version | awk '{print $$2}') && \
 	sed -i "s/__version__ = \".*\"/__version__ = \"$$NEW_VERSION\"/" {{cookiecutter.project_slug}}/__init__.py && \
-	echo "✅ Updated __init__.py to version $$NEW_VERSION"
-
-.PHONY: _git-tag-and-push
-_git-tag-and-push: ## Internal: Create git tag and push
-	@echo "🏷️ Creating git tag and pushing to remote"
-	@NEW_VERSION=$$(uv version | awk '{print $$2}') && \
-	git add pyproject.toml {{cookiecutter.project_slug}}/__init__.py && \
-	git commit -m "Bump version to $$NEW_VERSION" && \
-	git tag "v$$NEW_VERSION" && \
-	git push origin main && \
-	git push origin "v$$NEW_VERSION" && \
-	echo "✅ Tagged and pushed version $$NEW_VERSION"
+	echo "✅ Version bumped to $$NEW_VERSION"
 
 {%- if cookiecutter.sphinx == "y" %}
 
-.PHONY: docs-html
-docs-html: ## Build and serve the documentation
-	@echo "🚀 Building HTML documentation"
-	@uv run --all-groups sphinx-build -b html docs/source docs/_build/html
+.PHONY: docs
+docs: ## Build HTML documentation
+	@echo "🚀 Building documentation"
+	@uv run --group docs sphinx-build -b html docs/source docs/_build/html
 
+.PHONY: docs-serve
+docs-serve: docs ## Build and serve documentation locally
+	@echo "🚀 Serving docs at http://localhost:8000"
+	@cd docs/_build/html && uv run python -m http.server 8000
 {%- endif%}
 
 .PHONY: help
